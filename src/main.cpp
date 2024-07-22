@@ -443,6 +443,7 @@ bool wifi_config(bool upload_flag)
                     if (_ssid_char2[i] == '\0')
                     {
                         _hasNull = true;
+                        Serial.printf("Debug: found null\r\n");
                         break;
                     }
                 }
@@ -465,26 +466,6 @@ bool wifi_config(bool upload_flag)
                     Serial.println(WiFi.localIP());
                     Serial.printf("SSID: %s\r\n", WiFi.SSID().c_str());
                     Serial.printf("RSSI: %d\r\n", WiFi.RSSI());
-                    Serial.printf("MQTT Server: %s\r\n", mqtt_server_char);
-                    Serial.printf("MQTT User: %s\r\n", mqtt_user_char);
-                    Serial.printf("MQTT Pass: %s\r\n", mqtt_pass_char);
-                    Serial.printf("MQTT TOPIC: %s\r\n", mqtt_topic_char);
-
-                    //*** generate topic_public ***
-                    String _strtmp = String(mqtt_topic_char) + "/" + String(unit);
-                    _strtmp.toCharArray(topic_public, _strtmp.length() + 1);
-                    Serial.printf("MQTT TOPIC-PUBLIC => %s\r\n", topic_public);
-
-                    //*** generate topic_subscribe ***
-                    _strtmp = String(mqtt_topic_char) + "/" + String(unit) + "/control";
-                    _strtmp.toCharArray(topic_sub, _strtmp.length() + 1);
-                    Serial.printf("MQTT TOPIC-SUBSCRIBE  => %s\r\n\r\n", topic_sub);
-
-                    client.setServer(mqtt_server_char, 1883);
-                    client.connect(topic_public, mqtt_user_char, mqtt_pass_char);
-                    client.setCallback(callback);
-                    client.subscribe(topic_sub);
-                    client.setBufferSize(5000);
                     _wifiConnected = true;
                     mcu.TickBuildinLED(1.0);
                     return true;
@@ -520,26 +501,6 @@ bool wifi_config(bool upload_flag)
                             Serial.println(WiFi.localIP());
                             Serial.printf("SSID: %s\r\n", WiFi.SSID().c_str());
                             Serial.printf("RSSI: %d\r\n", WiFi.RSSI());
-                            Serial.printf("MQTT Server: %s\r\n", mqtt_server_char);
-                            Serial.printf("MQTT User: %s\r\n", mqtt_user_char);
-                            Serial.printf("MQTT Pass: %s\r\n", mqtt_pass_char);
-                            Serial.printf("MQTT TOPIC: %s\r\n", mqtt_topic_char);
-
-                            //*** generate topic_public ***
-                            String _strtmp = String(mqtt_topic_char) + "/" + String(unit);
-                            _strtmp.toCharArray(topic_public, _strtmp.length() + 1);
-                            Serial.printf("MQTT TOPIC-PUBLIC => %s\r\n", topic_public);
-
-                            //*** generate topic_subscribe ***
-                            _strtmp = String(mqtt_topic_char) + "/" + String(unit) + "/control";
-                            _strtmp.toCharArray(topic_sub, _strtmp.length() + 1);
-                            Serial.printf("MQTT TOPIC-SUBSCRIBE  => %s\r\n\r\n", topic_sub);
-
-                            client.setServer(mqtt_server_char, 1883);
-                            client.connect(topic_public, mqtt_user_char, mqtt_pass_char);
-                            client.setCallback(callback);
-                            client.subscribe(topic_sub);
-                            client.setBufferSize(5000);
                             _wifiConnected = true;
 
                             // record latest wifi to 'wifi_latest.conf'
@@ -552,6 +513,8 @@ bool wifi_config(bool upload_flag)
 
                             _wifiConnected = true;
                             mcu.TickBuildinLED(1.0);
+                            mcu.TickBlueLED(0);
+                            mcu.TickRedLED(0);
                             // break;
                             return true;
                         }
@@ -561,6 +524,9 @@ bool wifi_config(bool upload_flag)
                     if (!_wifiConnected)
                     {
                         wm.setConfigPortalTimeout(300); // sets timeout before AP,webserver loop ends and exits even if there has been no setup.
+                        mcu.TickBlueLED(0.1);
+                        vTaskDelay(100);
+                        mcu.TickRedLED(0.1);
                         if (wm.autoConnect(unit, "password"))
                         {
                             Serial.printf("Success to connected\r\n");
@@ -568,25 +534,6 @@ bool wifi_config(bool upload_flag)
                             Serial.println(WiFi.localIP());
                             Serial.printf("SSID: %s\r\n", WiFi.SSID().c_str());
                             Serial.printf("RSSI: %d\r\n", WiFi.RSSI());
-                            Serial.printf("MQTT Server: %s\r\n", mqtt_server_char);
-                            Serial.printf("MQTT User: %s\r\n", mqtt_user_char);
-                            Serial.printf("MQTT Pass: %s\r\n", mqtt_pass_char);
-                            Serial.printf("MQTT TOPIC: %s\r\n", mqtt_topic_char);
-
-                            //*** generate topic_public ***
-                            String _strtmp = String(mqtt_topic_char) + "/" + String(unit);
-                            _strtmp.toCharArray(topic_public, _strtmp.length() + 1);
-                            Serial.printf("MQTT TOPIC-PUBLIC => %s\r\n", topic_public);
-
-                            //*** generate topic_subscribe ***
-                            _strtmp = String(mqtt_topic_char) + "/" + String(unit) + "/control";
-                            _strtmp.toCharArray(topic_sub, _strtmp.length() + 1);
-                            Serial.printf("MQTT TOPIC-SUBSCRIBE  => %s\r\n\r\n", topic_sub);
-                            client.setServer(mqtt_server_char, 1883);
-                            client.connect(topic_public, mqtt_user_char, mqtt_pass_char);
-                            client.setCallback(callback);
-                            client.subscribe(topic_sub);
-                            client.setBufferSize(5000);
 
                             /* record ssid and password to 'wifi.conf' */
                             String _json_appendFile = "";
@@ -612,6 +559,9 @@ bool wifi_config(bool upload_flag)
                             writeFile(SPIFFS, "/wifi_latest.conf", _json_OverwriteFile.c_str());
 
                             mcu.TickBuildinLED(1.0);
+                            mcu.TickBlueLED(0);
+                            mcu.TickRedLED(0);
+
                             return true;
                         }
                         else
