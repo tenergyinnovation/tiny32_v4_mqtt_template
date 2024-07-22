@@ -52,3 +52,6 @@ Please clone to lib
 3. git clone https://github.com/espressif/arduino-esp32/tree/master/libraries/HTTPClient
 4. git clone https://github.com/tzapu/WiFiManager.git
 5. git clone https://github.com/knolleary/pubsubclient.git
+
+On shell prompt you can run command
+% ./clone_repo.sh
