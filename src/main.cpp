@@ -447,7 +447,7 @@ bool wifi_config(bool upload_flag)
                     }
                 }
 
-                if (_hasNull)
+                if (!_hasNull)
                 {
                     WiFi.begin(_ssid_char2, _pass_char2); // ทำการเชื่อมต่อ WiFi ตัวล่าสุด
                     while ((WiFi.status() != WL_CONNECTED) && (_timeoutCount2 < WIFI_TIMEOUT))
